@@ -1,5 +1,5 @@
 import unittest
-from learning_unittests import twitter
+import twitter
 
 
 class TwitterTest(unittest.TestCase):
