@@ -8,10 +8,12 @@ class TestEmployee(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         print('setupClass')
+        #done once before all tests
 
     @classmethod
     def tearDownClass(cls):
         print('teardownClass')
+        #done once after all tests
 
     def setUp(self):
         print('setUp')
@@ -20,6 +22,7 @@ class TestEmployee(unittest.TestCase):
 
     def tearDown(self):
         print('tearDown\n')
+        #ran after every test
 
     def test_email(self):
         print('test_email')

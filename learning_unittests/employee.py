@@ -4,7 +4,7 @@ import requests
 class Employee:
     """A sample Employee class"""
 
-    raise_amt = 1.05
+    raise_amount = 1.05
 
     def __init__(self, first, last, pay):
         self.first = first
@@ -20,7 +20,7 @@ class Employee:
         return '{} {}'.format(self.first, self.last)
 
     def apply_raise(self):
-        self.pay = int(self.pay * self.raise_amt)
+        self.pay = int(self.pay * self.raise_amount)
 
     def monthly_schedule(self, month):
         response = requests.get(f'http://company.com/{self.last}/{month}')
