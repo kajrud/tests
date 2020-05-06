@@ -1,6 +1,7 @@
-import unittest.mock
+from unittest.mock import patch, Mock, MagicMock
 from twitter import Twitter
 import pytest
+import requests
 
 class ResponseGetMock():
     def json(self):
@@ -40,7 +41,7 @@ def test_twitter_init(twitter):
 
 
 def test_tweet_single_message(twitter):
-    with unittest.mock.patch.object(twitter, 'get_user_avatar', return_value='test'):
+    with patch.object(twitter, 'get_user_avatar', return_value='test'):
         twitter.tweet("Test message")
         assert twitter.tweet_messages == ["Test message"]
 
@@ -69,11 +70,24 @@ def test_initialize_two_twitter_classes(backend):
 def test_tweet_with_hashtag(twitter, message, expected):
     assert twitter.find_hashtags(message) == expected
 
-@unittest.mock.patch.object(Twitter, 'get_user_avatar', return_value='test')
+@patch.object(Twitter, 'get_user_avatar', return_value='test')
 def test_tweet_with_username(avatar_mock, twitter):
     if not twitter.username:
         pytest.skip()
 
     twitter.tweet('Test message')
-    assert twitter.tweets == [{'message' : 'Test message', 'avatar' : 'test'}]
+    assert twitter.tweets == [{'message' : 'Test message', 'avatar' : 'test', 'hashtags': []}]
     avatar_mock.assert_called()
+
+@patch.object(requests.sessions.Session.request, 'get', return_value=ResponseGetMock())
+def test_tweet_with_hashtag_mock(twitter):
+    twitter.find_hashtags = Mock()
+    twitter.find_hashtags.return_value = ['first']
+    twitter.tweet('Test #second')
+    assert twitter.tweets[0]['hashtags'] == ['first']
+    twitter.find_hashtags.assert_called_with('Test #second')
+
+def test_twitter_version(twitter):
+    twitter.version = MagicMock()
+    twitter.version.__eq__.return_value = '2.0'
+    assert twitter.version == '2.0'
