@@ -7,20 +7,9 @@ class ResponseGetMock():
     def json(self):
         return {'avatar_url': 'test'}
 
-@pytest.fixture(autouse=True)
-def no_requests(monkeypatch):
-    monkeypatch.delattr('requests.sessions.Session.request')
-
-@pytest.fixture
-def backend(tmpdir):
-    temp_file = tmpdir.join('test.txt')
-    temp_file.write("")
-    return temp_file
-
 @pytest.fixture(params=[None, 'python'])
 def username(request):
     return request.param
-
 
 @pytest.fixture(params=['list', 'backend'], name='twitter')
 def fixture_twitter(backend, username, request, monkeypatch):
@@ -38,7 +27,6 @@ def fixture_twitter(backend, username, request, monkeypatch):
 
 def test_twitter_init(twitter):
     assert twitter
-
 
 def test_tweet_single_message(twitter):
     with patch.object(twitter, 'get_user_avatar', return_value='test'):
@@ -79,7 +67,7 @@ def test_tweet_with_username(avatar_mock, twitter):
     assert twitter.tweets == [{'message' : 'Test message', 'avatar' : 'test', 'hashtags': []}]
     avatar_mock.assert_called()
 
-@patch.object(requests.sessions.Session.request, 'get', return_value=ResponseGetMock())
+@patch.object(requests, 'get', return_value=ResponseGetMock())
 def test_tweet_with_hashtag_mock(twitter):
     twitter.find_hashtags = Mock()
     twitter.find_hashtags.return_value = ['first']
