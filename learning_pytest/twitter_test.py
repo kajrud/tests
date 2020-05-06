@@ -1,5 +1,5 @@
+import unittest.mock
 from twitter import Twitter
-
 import pytest
 
 class ResponseGetMock():
@@ -28,19 +28,21 @@ def fixture_twitter(backend, username, request, monkeypatch):
     elif request.param == 'backend':
         twitter = Twitter(backend=backend, username=username)
 
-    def monkey_return():
-        return 'test'
-
-    monkeypatch.setattr(twitter, 'get_user_avatar', monkey_return)
+    # def monkey_return():
+    #     return 'test'
+    #
+    # monkeypatch.setattr(twitter, 'get_user_avatar', monkey_return)
 
     return twitter
 
 def test_twitter_init(twitter):
     assert twitter
 
+
 def test_tweet_single_message(twitter):
-    twitter.tweet("Test message")
-    assert twitter.tweet_messages == ["Test message"]
+    with unittest.mock.patch.object(twitter, 'get_user_avatar', return_value='test'):
+        twitter.tweet("Test message")
+        assert twitter.tweet_messages == ["Test message"]
 
 def test_tweet_long_message(twitter):
     with pytest.raises(Exception):
@@ -67,9 +69,11 @@ def test_initialize_two_twitter_classes(backend):
 def test_tweet_with_hashtag(twitter, message, expected):
     assert twitter.find_hashtags(message) == expected
 
-def test_tweet_witj_username(twitter):
+@unittest.mock.patch.object(Twitter, 'get_user_avatar', return_value='test')
+def test_tweet_with_username(avatar_mock, twitter):
     if not twitter.username:
         pytest.skip()
 
     twitter.tweet('Test message')
     assert twitter.tweets == [{'message' : 'Test message', 'avatar' : 'test'}]
+    avatar_mock.assert_called()
