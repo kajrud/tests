@@ -42,6 +42,7 @@ class Twitter():
             return None
 
         url = urljoin(users_api, self.username)
+        import wdb; wdb.set_trace()
         resp = requests.get(url)
         for counter, line in enumerate(resp):
             if ['login'] == self.username:
